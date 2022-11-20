@@ -16,10 +16,19 @@ License: MIT
 module gl3n.math;
 
 public {
-    import std.math : PI, sin, cos, tan, asin, acos, atan, atan2,
+    import std.math : PI;
+    import core.stdc.math : sin, cos, tan, atan,
                       sinh, cosh, tanh, asinh, acosh, atanh,
-                      pow, exp, log, exp2, log2, sqrt,
+                      pow, exp, log, exp2, log2,
                       floor, trunc, round, ceil, modf;
+    extern(C) {
+        pure @safe @nogc nothrow:
+        double sqrt(double x);
+        double acos(double x);
+        double asin(double x);
+        double atan2(double y, double x);
+    }
+
     alias round roundEven;
     alias floor fract;
     //import core.stdc.math : fmodf;

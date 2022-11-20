@@ -23,11 +23,9 @@ private {
     import std.math : isNaN, isInfinity;
     import std.conv : to;
     import std.traits : isIntegral, isFloatingPoint, isStaticArray, isDynamicArray, isImplicitlyConvertible, isArray;
-    import std.string : format, rightJustify;
-    import std.array : join;
-    import std.algorithm : max, min, reduce;
     import gl3n.math : clamp, PI, sqrt, sin, cos, acos, tan, asin, atan2, almost_equal;
     import gl3n.util : is_vector, is_matrix, is_quaternion, TupleRange;
+    import gl3n.util : is_vector, is_matrix, TupleRange;
 }
 
 version(NoReciprocalMul) {
@@ -57,13 +55,13 @@ struct Vector(type, int dimension_) {
     /// Returns a pointer to the coordinates.
     @property auto value_ptr() const { return vector.ptr; }
 
-    /// Returns the current vector formatted as string, useful for printing the vector.
-    @property string as_string() {
-        return format("%s", vector);
-    }
-    alias as_string toString; /// ditto
+    // /// Returns the current vector formatted as string, useful for printing the vector.
+    // @property string as_string() {
+    //     return format("%s", vector);
+    // }
+    // alias as_string toString; /// ditto
 
-    @safe pure nothrow:
+    @safe pure nothrow export:
     ///
     @property ref inout(vt) get_(char coord)() inout {
         return vector[coord_to_index!coord];
@@ -402,7 +400,8 @@ struct Vector(type, int dimension_) {
         real temp = 0;
 
         foreach(index; TupleRange!(0, dimension)) {
-            temp += vector[index]^^2;
+            // temp += vector[index]^^2;
+            temp += vector[index]*vector[index];
         }
 
         return temp;
@@ -806,13 +805,17 @@ struct Matrix(type, int rows_, int cols_) if((rows_ > 0) && (cols_ > 0)) {
     @property auto value_ptr() const { return matrix[0].ptr; }
 
     /// Returns the current matrix formatted as flat string.
-    @property string as_string() {
+    @property string as_string()() {
+    import std.string : format;
         return format("%s", matrix);
     }
     alias as_string toString; /// ditto
 
     /// Returns the current matrix as pretty formatted string.
-    @property string as_pretty_string() {
+    @property string as_pretty_string()() {
+        import std.string : format, rightJustify;
+        import std.array : join;
+        import std.algorithm : max, min, reduce;
         string fmtr = "%s";
 
         size_t rjust = max(format(fmtr, reduce!(max)(matrix[])).length,
@@ -1985,7 +1988,8 @@ struct Quaternion(type) {
     @property auto value_ptr() const { return quaternion.ptr; }
 
     /// Returns the current vector formatted as string, useful for printing the quaternion.
-    @property string as_string() {
+    @property string as_string()() {
+        import std.string : format;
         return format("%s", quaternion);
     }
     alias as_string toString;
@@ -2621,7 +2625,10 @@ struct Quaternion(type) {
     }
 
     bool opEquals(const Quaternion qu) const {
-        return quaternion == qu.quaternion;
+        return (quaternion[0] == qu.quaternion[0])
+                & (quaternion[1] == qu.quaternion[1])
+                & (quaternion[2] == qu.quaternion[2])
+                & (quaternion[3] == qu.quaternion[3]);
     }
 
     bool opCast(T : bool)() const  {
